@@ -1,1 +1,79 @@
-<h1>Social Security Projections: What is the Social Safety Net in the United States expected to look like in 75 years?</h1>
+<html>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <!-- <style> circle {fill: lightblue; stroke: rgb(0, 0, 0);} </style> -->
+  <body onload="init()">
+    <svg position:fixed top:0 left:0 height:100 width:100></svg>
+    <script>
+      <h1>
+        Social Security Projections: What is the Social Safety Net in the United
+        States expected to look like in 75 years?
+      </h1>;
+      async function init() {
+        data = await d3.csv(
+          "/Users/annika/cs416/USFR_StmtSocIns_20191001_20240930.csv",
+          (d) => {
+            return {
+              ...d,
+              record_date: +d.record_date,
+              program_desc: +d.program_desc,
+              account_desc: +d.account_desc,
+              participant_grp_desc: +d.participant_grp_desc,
+              projection_tril_amt: +d.projection_tril_amt,
+              src_line_nbr: +d.src_line_nbr,
+              record_fiscal_year: +d.record_fiscal_year,
+              record_fiscal_quarter: +d.record_fiscal_quarter,
+              record_calendar_year: +d.record_calendar_year,
+              record_calendar_quarter: +d.record_calendar_quarter,
+              record_calendar_month: +d.record_calendar_month,
+              record_calendar_day: +d.record_calendar_day,
+            };
+          }
+        );
+
+        // var width = 200;
+        // var height = 200;
+
+        // d3.select("svg")
+        // .append("g")
+        // .attr("transform", "translate(50,50)")
+        // .selectAll("circle")
+        // .data(data)
+        // .enter()
+        // .append("circle");
+
+        // var y = d3.scaleLog()
+        // .range([ height, 0 ])
+        // .domain([ 10, 150 ])
+        // .base(10);
+
+        // d3.select("svg")
+        // .append("g")
+        // .attr("transform", "translate(50,50)")
+        // .attr("fill","none")
+        // .attr("font-size",10)
+        // .attr("font-family","sans-serif")
+        // .attr("text-anchor","end")
+        // .call(d3.axisLeft(y).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")));
+
+        // var x = d3.scaleLog()
+        // .range([ 0, width ])
+        // .domain([ 10, 150 ])
+        // .base(10);
+
+        // d3.select("svg")
+        // .append("g")
+        // .attr("transform", "translate(50,250)")
+        // .attr("fill","none")
+        // .attr("font-size",10)
+        // .attr("font-family","sans-serif")
+        // .attr("text-anchor","middle")
+        // .call(d3.axisBottom(x).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")));
+
+        // d3.selectAll("circle")
+        // .attr("cx", function(d) {return x(d.AverageCityMPG);})
+        // .attr("cy", function(d) {return y(d.AverageHighwayMPG);})
+        // .attr("r", function(d) {return (d.EngineCylinders + 2);});
+      }
+    </script>
+  </body>
+</html>
