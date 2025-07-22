@@ -1,12 +1,18 @@
 <html>
-  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <style>
+    h1 {
+      text-align: center;
+    }
+  </style>
   <!-- <style> circle {fill: lightblue; stroke: rgb(0, 0, 0);} </style> -->
   <body onload="init()">
     <svg position:fixed top:0 left:0 height:100 width:100></svg>
-    <title>
+    <title>Social Security Projections</title>
+    <h1>
       Social Security Projections: What is the Social Safety Net in the United
       States expected to look like in 75 years?
-    </title>
+    </h1>
     <script>
       async function init() {
         data = await d3.csv(
@@ -30,49 +36,125 @@
           }
         );
 
-        // var width = 200;
-        // var height = 200;
+        // Specify the chart’s dimensions.
+        const barHeight = 25;
+        const marginTop = 30;
+        const marginRight = 60;
+        const marginBottom = 10;
+        const marginLeft = 60;
+        const height =
+          Math.ceil((data.length + 0.1) * barHeight) + marginTop + marginBottom;
 
-        // d3.select("svg")
-        // .append("g")
-        // .attr("transform", "translate(50,50)")
-        // .selectAll("circle")
-        // .data(data)
-        // .enter()
-        // .append("circle");
+        // Create the positional scales.
+        const x = d3
+          .scaleLinear()
+          .domain(
+            d3.extent(function (d) {
+              return d.projection_tril_amt;
+            })
+          )
+          .rangeRound([marginLeft, width - marginRight]);
 
-        // var y = d3.scaleLog()
-        // .range([ height, 0 ])
-        // .domain([ 10, 150 ])
-        // .base(10);
+        const y = d3
+          .scaleBand()
+          .domain(
+            data.map(function (d) {
+              return d.program_desc;
+            })
+          )
+          .rangeRound([marginTop, height - marginBottom])
+          .padding(0.1);
 
-        // d3.select("svg")
-        // .append("g")
-        // .attr("transform", "translate(50,50)")
-        // .attr("fill","none")
-        // .attr("font-size",10)
-        // .attr("font-family","sans-serif")
-        // .attr("text-anchor","end")
-        // .call(d3.axisLeft(y).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")));
+        // Create the format function.
+        const format = d3.format(metric === "absolute" ? "+,d" : "+.1%");
+        const tickFormat =
+          metric === "absolute"
+            ? d3.formatPrefix("+.1", 1e6)
+            : d3.format("+.0%");
 
-        // var x = d3.scaleLog()
-        // .range([ 0, width ])
-        // .domain([ 10, 150 ])
-        // .base(10);
+        // Create the SVG container.
+        const svg = d3
+          .create("svg")
+          .attr("viewBox", [0, 0, width, height])
+          .attr(
+            "style",
+            "max-width: 100%; height: auto; font: 10px sans-serif;"
+          );
 
-        // d3.select("svg")
-        // .append("g")
-        // .attr("transform", "translate(50,250)")
-        // .attr("fill","none")
-        // .attr("font-size",10)
-        // .attr("font-family","sans-serif")
-        // .attr("text-anchor","middle")
-        // .call(d3.axisBottom(x).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")));
+        // Add a rect for each state.
+        svg
+          .append("g")
+          .selectAll()
+          .data(data)
+          .join("rect")
+          .attr("fill", function (d) {
+            d3.schemeRdBu[3][d.projection_tril_amt > 0 ? 2 : 0];
+          })
+          .attr("x", function (d) {
+            x(Math.min(d.projection_tril_amt, 0));
+          })
+          .attr("y", function (d) {
+            y(d.program_desc);
+          })
+          .attr("width", function (d) {
+            Math.abs(x(d.projection_tril_amt) - x(0));
+          })
+          .attr("height", y.bandwidth());
 
-        // d3.selectAll("circle")
-        // .attr("cx", function(d) {return x(d.AverageCityMPG);})
-        // .attr("cy", function(d) {return y(d.AverageHighwayMPG);})
-        // .attr("r", function(d) {return (d.EngineCylinders + 2);});
+        // Add a text label for each state.
+        svg
+          .append("g")
+          .attr("font-family", "sans-serif")
+          .attr("font-size", 10)
+          .selectAll()
+          .data(data)
+          .join("text")
+          .attr("text-anchor", function (d) {
+            d.projection_tril_amt < 0 ? "end" : "start";
+          })
+          .attr("x", function (d) {
+            x(d.projection_tril_amt) + Math.sign(d.projection_tril_amt - 0) * 4;
+          })
+          .attr("y", function (d) {
+            y(d.program_desc) + y.bandwidth() / 2;
+          })
+          .attr("dy", "0.35em")
+          .text(function (d) {
+            format(d.projection_tril_amt);
+          });
+
+        // Add the axes and grid lines.
+        svg
+          .append("g")
+          .attr("transform", `translate(0,${marginTop})`)
+          .call(
+            d3
+              .axisTop(x)
+              .ticks(width / 80)
+              .tickFormat(tickFormat)
+          )
+          .call((g) =>
+            g
+              .selectAll(".tick line")
+              .clone()
+              .attr("y2", height - marginTop - marginBottom)
+              .attr("stroke-opacity", 0.1)
+          )
+          .call((g) => g.select(".domain").remove());
+
+        svg
+          .append("g")
+          .attr("transform", `translate(${x(0)},0)`)
+          .call(d3.axisLeft(y).tickSize(0).tickPadding(6))
+          .call((g) =>
+            g
+              .selectAll(".tick text")
+              .filter((d, i) => data[i].projection_tril_amt < 0)
+              .attr("text-anchor", "start")
+              .attr("x", 6)
+          );
+
+        return svg.node();
       }
     </script>
   </body>
