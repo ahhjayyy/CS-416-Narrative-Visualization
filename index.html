@@ -3,11 +3,11 @@
   <!-- <style> circle {fill: lightblue; stroke: rgb(0, 0, 0);} </style> -->
   <body onload="init()">
     <svg position:fixed top:0 left:0 height:100 width:100></svg>
+    <title>
+      Social Security Projections: What is the Social Safety Net in the United
+      States expected to look like in 75 years?
+    </title>
     <script>
-      <h1>
-        Social Security Projections: What is the Social Safety Net in the United
-        States expected to look like in 75 years?
-      </h1>;
       async function init() {
         data = await d3.csv(
           "/Users/annika/cs416/USFR_StmtSocIns_20191001_20240930.csv",
