@@ -4,15 +4,19 @@
     h1 {
       text-align: center;
     }
+    h2 {
+      text-align: center;
+    }
   </style>
   <!-- <style> circle {fill: lightblue; stroke: rgb(0, 0, 0);} </style> -->
   <body onload="init()">
     <svg position:fixed top:0 left:0 height:100 width:100></svg>
     <title>Social Security Projections</title>
-    <h1>
-      Social Security Projections: What is the Social Safety Net in the United
-      States expected to look like in 75 years?
-    </h1>
+    <h1>Social Security Projections</h1>
+    <h2>
+      What is the Social Safety Net in the United States expected to look like
+      in 75 years?
+    </h2>
     <script>
       async function init() {
         data = await d3.csv(
@@ -50,7 +54,7 @@
           .scaleLinear()
           .domain(
             d3.extent(function (d) {
-              return d.projection_tril_amt;
+              if (d.record_fiscal_year == 2024) return d.projection_tril_amt;
             })
           )
           .rangeRound([marginLeft, width - marginRight]);
@@ -59,7 +63,7 @@
           .scaleBand()
           .domain(
             data.map(function (d) {
-              return d.program_desc;
+              if (d.record_fiscal_year == 2024) return d.program_desc;
             })
           )
           .rangeRound([marginTop, height - marginBottom])
@@ -81,7 +85,7 @@
             "max-width: 100%; height: auto; font: 10px sans-serif;"
           );
 
-        // Add a rect for each state.
+        // Add a rect for each category.
         svg
           .append("g")
           .selectAll()
