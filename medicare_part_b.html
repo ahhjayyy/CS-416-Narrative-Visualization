@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.js"></script>
+  <head>
+    <style>
+      h1 {
+        text-align: center;
+      }
+      h2 {
+        text-align: center;
+      }
+      svg {
+        display: block;
+        margin: auto;
+      }
+
+      body {
+        height: 100%;
+        width: 100%;
+      }
+      canvas {
+        background-color: wheat;
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      .button {
+        background-color: #04aa6d; /* Green */
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+        border-radius: 8px;
+      }
+
+      .button1 {
+        background-color: white;
+        color: black;
+        border: 2px solid #04aa6d;
+        border-radius: 8px;
+      }
+
+      button:hover {
+        background-color: #4caf50; /* Green */
+        color: white;
+      }
+    </style>
+    <button class="button button1" onclick="history.back()">Go Back</button>
+    <title>Social Insurance Projections: Medicare Part B</title>
+    <h1>Federal Supplementary Medical Insurance Projections</h1>
+    <h2>
+      By eligibility group, what are the insurance projections for Medicare Part
+      B?<br />
+      Part B covers medically necessary services and preventative services, such
+      as ambulance services, clinical research <br />
+      durable medical equipment, limited outpatient prescription drugs, mental
+      health and substance use disorders, and oxygen equipment and accessories.
+    </h2>
+  </head>
+  <body onload="init()">
+    <script>
+      async function init() {
+        data = await d3.csv("USFR_StmtSocIns_20191001_20240930.csv", (d) => {
+          return {
+            ...d,
+          };
+        });
+      }
+    </script>
+  </body>
+</html>
