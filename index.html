@@ -4,11 +4,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.js"></script>
   <head>
     <style>
-      h1 {
-        text-align: center;
-      }
+      h1,
       h2 {
         text-align: center;
+        color: #2a3a5e;
       }
       svg {
         display: block;
@@ -16,6 +15,10 @@
       }
 
       body {
+        font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+        background: #fbf9f7;
+        margin: 0;
+        padding: 0;
         height: 100%;
         width: 100%;
       }
@@ -30,8 +33,120 @@
         height: 100%;
         width: 100%;
       }
+      .myLines {
+        cursor: pointer;
+      }
+
+      .button,
+      .button2 {
+        background-color: #07beb8;
+        color: white;
+        border: none;
+        padding: 16px 32px;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-top: 24px;
+        transition: background 0.2s, color 0.2s;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .button2 {
+        background: white;
+        color: #07beb8;
+        border: 2px solid #07beb8;
+      }
+
+      .button2:hover,
+      .button:hover {
+        background: #111d4a;
+        color: #fff;
+      }
+
+      input[type="range"] {
+        width: 300px;
+        accent-color: #07beb8;
+        margin-top: 16px;
+      }
+
+      .node:hover {
+        stroke-width: 7px !important;
+        opacity: 1 !important;
+      }
+      .tooltip {
+        position: absolute;
+        pointer-events: "cursor";
+        z-index: 10;
+        background: #fff;
+        border: 1px solid #07beb8;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font-size: 16px;
+        color: #2a3a5e;
+        box-shadow: 0 2px 8px rgba(61, 125, 255, 0.08);
+        transition: opacity 0.2s;
+      }
+
+      #main-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 40px;
+        margin: 40px auto 0 auto;
+        max-width: 1400px;
+      }
+
+      #bubble_dataviz {
+        flex: 2 1 0;
+        align-items: center;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        padding: 0;
+        padding-top: 20px;
+      }
+
+      #info-box {
+        flex: 1 1 0;
+        background: #f5f8ff;
+        border-radius: 16px;
+        border-left: 6px solid #111d4a;
+        background: linear-gradient(135deg, #b2e1e8 80%, #98dfea 100%);
+        padding: 32px 24px;
+        min-width: 400px;
+        max-width: 800px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        margin-left: 20px;
+        margin-right: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      #info-box h2 {
+        margin-top: 0;
+        color: #111d4a;
+      }
+
+      #info-box button {
+        margin-top: 32px;
+        width: 100%;
+      }
+
+      @media (max-width: 1000px) {
+        #main-container {
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+        }
+        #bubble_dataviz,
+        #info-box {
+          min-width: 90vw;
+          max-width: 98vw;
+        }
+      }
     </style>
-    <title>Social Insurance Projections</title>
     <h1>Social Insurance Projections</h1>
     <h2>
       What is the Social Safety Net in the United States expected to look like
@@ -41,10 +156,68 @@
       Medicare Part D.
     </h2>
   </head>
-  <div id="my_dataviz"></div>
+  <label for="yearSlider" style="margin-left: 40px"
+    >Year: <span id="yearValue">2024</span></label
+  >
+  <input
+    type="range"
+    min="2020"
+    max="2024"
+    value="2024"
+    id="yearSlider"
+    step="1"
+    style="width: 300px; vertical-align: middle"
+    list="year-ticks"
+  />
+  <datalist id="year-ticks">
+    <option value="2020"></option>
+    <option value="2021"></option>
+    <option value="2022"></option>
+    <option value="2023"></option>
+    <option value="2024"></option>
+  </datalist>
 
   <body onload="init()">
+    <div id="main-container">
+      <div id="bubble_dataviz"></div>
+      <div id="info-box">
+        <h2>About These Projections</h2>
+        <p>
+          This visualization shows the projected present value of future
+          expenditures in excess of future revenue for major US social insurance
+          programs, 75 years from the projection date.
+          <br />
+          <br />
+          The fact that all four principal Social Insurance programs are
+          projected to be losing trillions of dollars in 75 years paints a bleak
+          picture of services most Americans need. As you continue to explore,
+          year-over-year trends and revenue & expenditure breakdowns will
+          suggest political and economic realities that contribute to these
+          numbers, and ways to potentially fix them.
+          <br />
+          <br />
+          Use the slider to explore different years' projections, and note the
+          change in the size of the circles. Hover over the circles to see the
+          program they correspond to, as well as the value they are expected to
+          be losing.
+        </p>
+        <button id="myButton" class="button button2">See Time Trend</button>
+      </div>
+    </div>
+    <footer
+      style="
+        text-align: center;
+        color: #b0b8c9;
+        font-size: 14px;
+        margin: 32px 0 8px 0;
+      "
+    >
+      Data: U.S. Department of the Treasury, Bureau of the Fiscal Service
+      &mdash; Financial Report of the United States Government: Statements of
+      Social Insurance
+    </footer>
     <script>
+      // let allData;
       async function init() {
         data = await d3.csv("USFR_StmtSocIns_20191001_20240930.csv", (d) => {
           return {
@@ -52,320 +225,238 @@
           };
         });
         // Filter data to only include present value for each social insurance category
-        pv_data = data.filter(
-          (u) =>
-            u["Account Description"].includes(
-              "Present value of future expenditures in excess of future revenue"
-            )
-          //&& u["Calendar Year"] == 2024
-        );
-        console.log(pv_data);
-        var margin = { top: 50, right: 30, bottom: 30, left: 60 },
-          width = 1200 - margin.left - margin.right,
-          height = 800 - margin.top - margin.bottom;
+
+        function pv_data(data, year) {
+          return data.filter(
+            (u) =>
+              u["Calendar Year"] == year &&
+              u["Account Description"].includes(
+                "Present value of future expenditures in excess of future revenue"
+              ) &&
+              u["Program Description"] != "Social Insurance Summary" &&
+              u["Program Description"] != "Other"
+          );
+        }
+
+        // Function to prepare data for visualization
+        function dataReady(data) {
+          return data
+            .map((d) => {
+              return {
+                date: d["Calendar Year"],
+                prog_desc: d["Program Description"],
+                value: +d["Projection Amount (in Trillions)"],
+              };
+            })
+            .filter(function (elt) {
+              return elt != undefined;
+            });
+        }
+
+        // console.log(pv_data);
+        var margin = { top: 50, right: 30, bottom: 30, left: 60 };
+        var width = 1000 - margin.left - margin.right; // 1200 px
+        var height = 750 - margin.top - margin.bottom; // 1000 px
 
         // append the svg object to the body of the page
         var svg = d3
-          .select("#my_dataviz")
+          .select("#bubble_dataviz")
           .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-          .attr(
-            "transform",
-            "translate(" + margin.left + "," + margin.top + ")"
-          );
+          .attr("width", width)
+          .attr("height", height);
 
-        var allGroup = [
-          "Federal Old-Age, Survivors and Disability Insurance (Social Security)",
-          "Federal Hospital Insurance (Medicare Part A)",
-          "Federal Supplementary Medical Insurance (Medicare Part B)",
-          "Federal Supplementary Medical Insurance (Medicare Part D)",
-          // "Total present value of future expenditures in excess of future revenue",
-        ];
+        //Make the SVG responsive
+        svg
+          .attr("viewBox", `0 0 ${width} ${height}`)
+          .attr("preserveAspectRatio", "xMidYMid meet");
+        // Initial year
+        let currentYear = 2024;
+        let temp_prep = pv_data(data, currentYear);
+        let year_data = dataReady(temp_prep);
 
-        var dataReady = allGroup.map(function (grpName) {
-          // .map allows to do something for each element of the list
-          return {
-            name: grpName,
-            values: pv_data
-              .map(function (d) {
-                if (d["Program Description"] == grpName)
-                  return {
-                    date: d["Calendar Year"],
-                    value: +d["Projection Amount (in Trillions)"],
-                  };
-              })
-              .filter(function (elt) {
-                return elt != undefined;
-              }),
+        function update(data_ready) {
+          // create a tooltip
+          var Tooltip = d3
+            .select("#bubble_dataviz")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px");
+
+          // Three function that change the tooltip when user hover / move / leave a cell
+          var mouseover = function (event, d) {
+            Tooltip.style("opacity", 1);
+            d3.select(this)
+              .style("stroke", "black")
+              .style("stroke-width", 4)
+              .style("opacity", 1)
+              .style("cursor", "pointer");
           };
-        });
-        console.log(dataReady);
+          var mousemove = function (event, d) {
+            Tooltip.html(
+              "<u>" +
+                d.prog_desc +
+                "</u>" +
+                "<br> Projected to be losing $" +
+                d.value +
+                " trillion in " +
+                (Number(d.date) + 75)
+            )
+              .style("left", event.pageX + 20 + "px")
+              // mx OR d3.pointer(this)[0]
+              .style("top", event.pageY - 20 + "px");
+          };
+          var mouseleave = function (event, d) {
+            Tooltip.style("opacity", 0);
+            d3.select(this)
+              .style("stroke", "#ff4d4d")
+              .style("stroke-width", 4)
+              .style("opacity", 0.8);
+          };
+          console.log(data_ready);
+          // Find min and max values for scaling
+          var minValue = d3.min(data_ready, (d) => Math.abs(d.value));
+          var maxValue = d3.max(data_ready, (d) => Math.abs(d.value));
+          // Set your desired min and max radius in pixels
+          var minRadius = 75;
+          var maxRadius = 180;
+
+          var radiusScale = d3
+            .scaleSqrt()
+            .domain([minValue, maxValue])
+            .range([minRadius, maxRadius]);
+          // Create a sequential color scale from light to deep red
+          var color = d3
+            .scaleSequential()
+            .domain([minValue, maxValue])
+            .interpolator(function (t) {
+              return d3.interpolateReds(0.5 + t * 0.5);
+            });
+          // .range(d3.schemeCategory10)
+          // Initialize the circle: all located at the center of the svg area
+          var node = svg
+            .append("g")
+            .selectAll("circle")
+            .data(data_ready)
+            .enter()
+            .append("circle")
+            .attr("r", function (d) {
+              return radiusScale(Math.abs(d.value)); // Negative radius for inward facing circles
+            })
+            .attr("cx", width / 2)
+            .attr("cy", height / 2)
+            .style("fill", "#ff4d4d") // <-- color by d.prog_desc color(Math.abs(d.value))
+            .style("fill-opacity", 0.7)
+            .attr("stroke", "#ff4d4d") // <-- color by prog_desc
+            .style("stroke-width", 4)
+            .on("mouseover", mouseover) // What to do when hovered
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave);
+
+          // Features of the forces applied to the nodes:
+          var simulation = d3
+            .forceSimulation()
+            .force(
+              "center",
+              d3
+                .forceCenter()
+                .x(width / 2)
+                .y(height / 2)
+            ) // Attraction to the center of the svg area
+            .force("charge", d3.forceManyBody().strength(0)) // Nodes are attracted one each other of value is > 0
+            .force(
+              "collide",
+              d3
+                .forceCollide()
+                .strength(0.01)
+                .radius(function (d) {
+                  return radiusScale(Math.abs(d.value)) + 2;
+                })
+                .iterations(2)
+            )
+            .force("y", d3.forceY(height / 2).strength(0.07)) // Increase strength for tighter vertical packing; // Force that avoids circle overlapping
+            .force("x", d3.forceX(width / 2).strength(0.03)); // Lower strength for more horizontal spread
+
+          // Apply these forces to the nodes and update their positions.
+          // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+          simulation.nodes(data_ready).on("tick", function (d) {
+            node
+              .attr("cx", function (d) {
+                return d.x;
+              })
+              .attr("cy", function (d) {
+                return d.y;
+              });
+            // labels
+            //   .attr("x", function (d) {
+            //     return d.x;
+            //   })
+            //   .attr("y", function (d) {
+            //     return d.y;
+            //   });
+          });
+        }
 
         // Annotations
-        const type = d3.annotationCalloutCircle;
-        const typeline = d3.annotationCalloutCurve;
-
         const annotations = [
           {
             note: {
-              label:
-                "Within just 5 years, the projection for Social Security has fallen a further $5 trillion into the red. Without significant changes to allocation, the program will be $25 trillion in debt by 2099.",
-              wrap: 300,
-              title: "A bleak outlook for Social Security",
-            },
-            //can use x, y directly instead of data
-            x: 1110,
-            y: 292,
-            dy: 30,
-            dx: -100,
-            subject: {
-              radius: 20,
-              radiusPadding: 5,
-            },
-          },
-        ];
-
-        const prompt_annotations = [
-          {
-            note: {
               // label:
-              //   "Click to learn more",
-              // wrap: 300,
-              title: "Click to learn more",
+              //   "Hover over the circles to see how much each program is expected to lose in the current year",
+              wrap: 300,
+              title:
+                "Hover over the circles to see how much each program is expected to lose in the current year",
+            },
+            connector: {
+              end: "none", // Can be none, or arrow or dot
+              type: "line", // ?? don't know what it does
+              lineType: "vertical", // ?? don't know what it does
             },
             //can use x, y directly instead of data
-            x: 900,
-            y: 100,
-            dy: 30,
-            dx: 0,
-            color: "black",
-            connector: { points: 0, end: "arrow" },
-            subject: {
-              radius: 20,
-              radiusPadding: 5,
-            },
+            x: width / 2 - 300,
+            y: 550,
           },
         ];
 
         const makeAnnotations = d3
           .annotation()
-          //also can set and override in the note.padding property
-          //of the annotation object
           .notePadding(15)
-          .type(type)
-          //accessors & accessorsInverse not needed
-          //if using x, y in annotations JSON
           .annotations(annotations);
 
         svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
 
-        const lineAnnotations = d3
-          .annotation()
-          //also can set and override in the note.padding property
-          //of the annotation object
-          .notePadding(15)
-          .type(typeline)
-          //accessors & accessorsInverse not needed
-          //if using x, y in annotations JSON
-          .annotations(prompt_annotations);
+        update(year_data);
 
-        svg.append("g").attr("class", "annotation-group").call(lineAnnotations);
+        // Slider event
+        const slider = document.getElementById("yearSlider");
+        const yearValue = document.getElementById("yearValue");
+        slider.oninput = function () {
+          const year = +this.value;
+          yearValue.textContent = year;
+          const filtered = pv_data(data, year);
+          const ready = dataReady(filtered);
 
-        // create a tooltip
-        var Tooltip = d3
-          .select("#my_dataviz")
-          .append("div")
-          .style("opacity", 0)
-          .attr("class", "tooltip")
-          .style("background-color", "white")
-          .style("border", "solid")
-          .style("border-width", "2px")
-          .style("border-radius", "5px")
-          .style("padding", "5px")
-          .style("position", "absolute");
+          // Remove old circles (and labels if you add them)
+          d3.select("#bubble_dataviz svg").remove();
 
-        // Three function that change the tooltip when user hover / move / leave a cell
-        var point_mouseover = function (evt, d) {
-          Tooltip.style("opacity", 1);
-          d3.select(this).style("stroke", "black").style("opacity", 1);
+          // Re-create SVG and call update
+          svg = d3
+            .select("#bubble_dataviz")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("viewBox", `0 0 ${width} ${height}`)
+            .attr("preserveAspectRatio", "xMidYMid meet");
+
+          update(ready);
         };
-        var point_mousemove = function (evt, d) {
-          const [mx, my] = d3.pointer(this);
-          Tooltip.html(
-            `75-year projection in ${d.date}:<br> $${d.value} trillion`
-          )
-            .style("left", evt.layerX + 375 + "px")
-            // mx OR d3.pointer(this)[0]
-            .style("top", evt.layerY + 200 + "px");
+        document.getElementById("myButton").onclick = function () {
+          window.location.href = "time_trend.html";
         };
-        var point_mouseleave = function (evt, d) {
-          Tooltip.style("opacity", 0);
-          d3.select(this).style("stroke", "none").style("opacity", 0.8);
-        };
-        var line_mouseclick = function (evt, d) {
-          console.log(d.name);
-          if (d.name == "Federal Hospital Insurance (Medicare Part A)") {
-            window.location.href = "medicare_part_a.html";
-          } else if (
-            d.name ==
-            "Federal Supplementary Medical Insurance (Medicare Part B)"
-          ) {
-            window.location.href = "medicare_part_b.html";
-          } else if (
-            d.name ==
-            "Federal Supplementary Medical Insurance (Medicare Part D)"
-          ) {
-            window.location.href = "medicare_part_d.html";
-          } else if (
-            d.name ==
-            "Federal Old-Age, Survivors and Disability Insurance (Social Security)"
-          ) {
-            window.location.href = "socsec.html";
-          }
-        };
-
-        var myColor = d3.scaleOrdinal().domain(allGroup).range(d3.schemeSet2);
-
-        // resize axis, keep graph within bounds of svg
-        // Add X axis
-        var x = d3.scaleLinear().domain([2020, 2024]).range([0, width]);
-        svg
-          .append("g")
-          .attr("transform", "translate(0,0)")
-          .call(
-            d3
-              .axisTop(x)
-              .tickValues([2020, 2021, 2022, 2023, 2024])
-              .tickFormat(d3.format(".4"))
-          );
-        svg
-          .append("text")
-          .attr("class", "x label")
-          .attr("text-anchor", "end")
-          .attr("x", width / 2 + 15)
-          .attr("y", -35)
-          .text("Year");
-        // Add Y axis
-        var y = d3
-          .scaleLinear()
-          .domain([-50, 0])
-          .range([height / 1.25, 0]);
-        svg.append("g").call(d3.axisLeft(y), y("Present Value (in Trillions)"));
-
-        svg
-          .append("text")
-          .attr("class", "y label")
-          .attr("text-anchor", "end")
-          .attr("x", -(height / 2) + 15)
-          .attr("y", -50)
-          .attr("dy", "0.75em")
-          .attr("transform", "rotate(-90)")
-          .text("Present Value (in Trillions)");
-
-        // Add the lines
-        var line = d3
-          .line()
-          .x(function (d) {
-            return x(d.date);
-          })
-          .y(function (d) {
-            return y(+d.value);
-          });
-        svg
-          .selectAll("myLines")
-          .data(dataReady)
-          .enter()
-          .append("path")
-          .attr("d", function (d) {
-            return line(d.values);
-          })
-          .attr("stroke", function (d) {
-            return myColor(d.name);
-          })
-          .style("stroke-width", 4)
-          .style("fill", "none")
-          .on("click", line_mouseclick);
-
-        // svg.select("myLines:nth-child(1)").on("click", medicarea_mouseclick);
-        // Add the points
-        svg
-          // First we need to enter in a group
-          .selectAll("myDots")
-          .data(dataReady)
-          .enter()
-          .append("g")
-          .style("fill", function (d) {
-            return myColor(d.name);
-          })
-          // Second we need to enter in the 'values' part of this group
-          .selectAll("myPoints")
-          .data(function (d) {
-            return d.values;
-          })
-          .enter()
-          .append("circle")
-          .attr("cx", function (d) {
-            return x(d.date);
-          })
-          .attr("cy", function (d) {
-            return y(d.value);
-          })
-          .attr("r", 5)
-          .attr("stroke", "white")
-          .on("mouseover", point_mouseover)
-          .on("mousemove", point_mousemove)
-          .on("mouseleave", point_mouseleave);
-
-        svg
-          .selectAll("mydots")
-          .data(dataReady)
-          .enter()
-          .append("circle")
-          .attr("cx", 0)
-          .attr("cy", function (d, i) {
-            return 595 + i * 25;
-          }) // 100 is where the first dot appears. 25 is the distance between dots
-          .attr("r", 7)
-          .style("fill", function (d) {
-            return myColor(d.name);
-          });
-
-        svg
-          .selectAll("myLegend")
-          .data(dataReady)
-          .enter()
-          .append("text")
-          .attr("x", 20)
-          .attr("y", function (d, i) {
-            return 600 + i * 25;
-          }) // 100 is where the first dot appears. 25 is the distance between dots
-          .style("fill", function (d) {
-            return myColor(d.name);
-          })
-          .text(function (d) {
-            return d.name;
-          })
-          .attr("text-anchor", "left")
-          .style("alignment-baseline", "middle")
-          .on("click", function (d) {
-            // is the element currently visible ?
-            currentOpacity = d3.selectAll("." + d.name).style("opacity");
-            // Change the opacity: from 0 to 1 or from 1 to 0
-            d3.selectAll("." + d.name)
-              .transition()
-              .style("opacity", currentOpacity == 1 ? 0 : 1);
-          });
-      }
-
-      async function MedicarePartA() {
-        data = await d3.csv("USFR_StmtSocIns_20191001_20240930.csv", (d) => {
-          return {
-            ...d,
-          };
-          // d3.select(id).html = "" .append()
-        });
       }
     </script>
   </body>

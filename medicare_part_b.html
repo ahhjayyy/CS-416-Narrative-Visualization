@@ -4,23 +4,26 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.js"></script>
   <head>
     <style>
-      h1 {
-        text-align: center;
-      }
+      h1,
       h2 {
         text-align: center;
+        color: #2a3a5e;
       }
+
       svg {
         display: block;
         margin: auto;
       }
 
       body {
+        font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+        background: #fbf9f7;
+        margin: 0;
+        padding: 0;
         height: 100%;
         width: 100%;
       }
       canvas {
-        background-color: wheat;
         display: block;
         position: absolute;
         top: 0;
@@ -30,54 +33,595 @@
         height: 100%;
         width: 100%;
       }
+      .myLines {
+        cursor: pointer;
+      }
 
-      .button {
-        background-color: #04aa6d; /* Green */
-        border: none;
+      .button,
+      .button2 {
+        background-color: #07beb8;
         color: white;
-        padding: 16px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
+        border: none;
+
+        border-radius: 8px;
         font-size: 16px;
-        margin: 4px 2px;
-        transition-duration: 0.4s;
+
+        transition: background 0.2s, color 0.2s;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .button1 {
+        background: white;
+
+        border: 2px solid #07beb8;
+        margin-left: 20px;
+      }
+
+      select {
+        background: white;
+
+        border: 2px solid #07beb8;
+
         cursor: pointer;
         border-radius: 8px;
       }
 
-      .button1 {
-        background-color: white;
-        color: black;
-        border: 2px solid #04aa6d;
-        border-radius: 8px;
+      .button2 {
+        background: white;
+        color: #07beb8;
+        padding: 16px 32px;
+        border: 2px solid #07beb8;
+        margin-top: 24px;
       }
 
-      button:hover {
-        background-color: #4caf50; /* Green */
-        color: white;
+      .button3 {
+        background: white;
+        color: #07beb8;
+        border: 2px solid #07beb8;
+        padding: 16px 16px;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-top: 0px;
+        transition: background 0.2s, color 0.2s;
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 16px 16px;
+        width: 100%;
+        margin-bottom: 0;
+      }
+      .button-group .button3 {
+        width: 100%;
+        margin-top: 0;
+      }
+
+      .button2:hover,
+      .button:hover {
+        background: #111d4a;
+        color: #fff;
+      }
+
+      input[type="range"] {
+        width: 300px;
+        accent-color: #07beb8;
+        margin-top: 16px;
+      }
+
+      .node:hover {
+        stroke-width: 7px !important;
+        opacity: 1 !important;
+      }
+      .tooltip {
+        position: absolute;
+        pointer-events: "cursor";
+        z-index: 10;
+        background: #fff;
+        border: 1px solid #07beb8;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font-size: 16px;
+        color: #2a3a5e;
+        box-shadow: 0 2px 8px rgba(61, 125, 255, 0.08);
+        transition: opacity 0.2s;
+      }
+
+      #main-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 40px;
+        margin: 40px auto 0 auto;
+        max-width: 1400px;
+      }
+
+      #my_dataviz {
+        flex: 2 1 0;
+        align-items: center;
+        background: #fff;
+        border-radius: 16px;
+        margin-left: 50px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        padding: 0;
+        padding-top: 20px;
+      }
+
+      #info-box {
+        flex: 1 1 0;
+        background: #f5f8ff;
+        border-radius: 16px;
+        border-left: 6px solid #111d4a;
+        background: linear-gradient(135deg, #b2e1e8 80%, #98dfea 100%);
+        padding: 32px 24px;
+        min-width: 400px;
+        max-width: 800px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+        margin-left: 0px;
+        margin-right: 50px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      #info-box h2 {
+        margin-top: 0;
+        color: #111d4a;
+      }
+
+      #info-box button {
+        margin-top: 32px;
+        width: 100%;
+      }
+
+      @media (max-width: 1000px) {
+        #main-container {
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+        }
+        #my_dataviz,
+        #info-box {
+          min-width: 90vw;
+          max-width: 98vw;
+        }
       }
     </style>
-    <button class="button button1" onclick="history.back()">Go Back</button>
-    <title>Social Insurance Projections: Medicare Part B</title>
-    <h1>Federal Supplementary Medical Insurance Projections</h1>
+    <h1>
+      Federal Supplementary Medical Insurance: Medicare Part B Projections
+    </h1>
     <h2>
       By eligibility group, what are the insurance projections for Medicare Part
-      B?<br />
-      Part B covers medically necessary services and preventative services, such
-      as ambulance services, clinical research <br />
-      durable medical equipment, limited outpatient prescription drugs, mental
-      health and substance use disorders, and oxygen equipment and accessories.
+      B?
     </h2>
   </head>
+
   <body onload="init()">
+    <div id="main-container">
+      <div id="my_dataviz">
+        <!-- Initialize a select button for participant group -->
+        <select class="select button1" id="selectButton"></select>
+        <!-- Initialize a select button for account type -->
+        <select class="select button1" id="acctButton"></select>
+      </div>
+      <div id="info-box">
+        <h2>About These Projections</h2>
+        <p>
+          Part B covers medically necessary services and preventative services,
+          such as ambulance services, clinical research, durable medical
+          equipment, limited outpatient prescription drugs, mental health and
+          substance use disorders, and oxygen equipment and accessories.
+          <br />
+          <br />
+          Revenue for Medicare comes directly from federal spending, funded by
+          contributions and dedicated income taxes on the American people.
+          Expenditures entail paying out benefits to covered persons.
+          <br />
+          Levels of growth in revenue and expenditures are keeping in line with
+          each other, showing both the increasing relevance of Part B service
+          coverage, as well as explaining the relative consistency of Part B
+          projections over the 5 year period of the dataset. With the OBBBA
+          widely considered to disadvantage Medicare beneficiaries, it remains
+          to be seen if this trend will continue as the landscape of the
+          healthcare system changes.
+          <br />
+          <br />
+          Hover over the bars to see 75-year projection amounts. Use the
+          dropdown selectors to adjust the results by elgibility group and
+          revenue vs. expenditures.
+        </p>
+        <button class="button button2" onclick="history.back()">Go Back</button>
+      </div>
+    </div>
+    <footer
+      style="
+        text-align: center;
+        color: #b0b8c9;
+        font-size: 14px;
+        margin: 32px 0 8px 0;
+      "
+    >
+      Data: U.S. Department of the Treasury, Bureau of the Fiscal Service
+      &mdash; Financial Report of the United States Government: Statements of
+      Social Insurance
+    </footer>
     <script>
+      // Revenue for Medicare Part A is We see, that among all
+      // participant groups, revenue is increasing and expenditures also
+      // increased, however, there was a slight decrease in expenditures in
+      // 2024. The combination of increased revenue and slightly decreased
+      // expenditures explain the upward projection for Part A.
       async function init() {
         data = await d3.csv("USFR_StmtSocIns_20191001_20240930.csv", (d) => {
           return {
             ...d,
           };
         });
+        // Filter data to only include present value for each social insurance category
+        function part_grp_data(data, part_grp) {
+          return data.filter(
+            (u) =>
+              u["Participant Group Description"].includes(part_grp) &&
+              u["Program Description"].includes("Medicare Part B")
+          );
+        }
+
+        // List of groups (here I have one group per column)
+        var allGroup = [
+          "Participants who have attained eligibility age (age 65 and over)",
+          "Participants who have not attained eligibility age",
+          "Future participants",
+          "All current and future participants",
+        ];
+
+        // add the options to the button
+        d3.select("#selectButton")
+          .selectAll("myOptions")
+          .data(allGroup)
+          .enter()
+          .append("option")
+          .text(function (d) {
+            return d;
+          }) // text showed in the menu
+          .attr("value", function (d) {
+            return d;
+          }); // corresponding value returned by the button
+
+        // List of groups (here I have one group per column)
+        var accGroup = ["Revenue", "Expenditures"];
+
+        // add the options to the button
+        d3.select("#acctButton")
+          .selectAll("acctOptions")
+          .data(accGroup)
+          .enter()
+          .append("option")
+          .text(function (d) {
+            return d;
+          }) // text showed in the menu
+          .attr("value", function (d) {
+            return d;
+          }); // corresponding value returned by the button
+
+        function dataReady(data, grpName) {
+          return {
+            name: grpName,
+            values: data
+              .map(function (d) {
+                if (d["Account Description"].includes(grpName))
+                  return {
+                    date: d["Calendar Year"],
+                    part_group: d["Participant Group Description"],
+                    value: +d["Projection Amount (in Trillions)"],
+                  };
+              })
+              .filter(function (elt) {
+                return elt != undefined;
+              }),
+          };
+        }
+
+        var margin = { top: 50, right: 30, bottom: 30, left: 60 },
+          width = 1200 - margin.left - margin.right,
+          height = 600 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3
+          .select("#my_dataviz")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr(
+            "transform",
+            "translate(" + margin.left + "," + margin.top + ")"
+          );
+
+        svg
+          .selectAll("rect")
+          .attr("width", 0)
+          .transition()
+          .delay(function (d, i) {
+            return i * 50;
+          })
+          .duration(1000)
+          .attr("width", function (d) {
+            return d.amount * 10;
+          });
+
+        // Initialize the X axis
+        var x = d3.scaleBand().range([width, 0]).padding(0.2);
+        var xAxis = svg
+          .append("g")
+          .attr("transform", "translate(0," + height + ")");
+
+        // Initialize the Y axis
+        var y = d3.scaleLinear().range([height, 0]);
+        var yAxis = svg.append("g").attr("class", "myYaxis");
+
+        var part_grp =
+          "Participants who have attained eligibility age (age 65 and over)";
+
+        var acct_desc = "Revenue";
+
+        // Create a tooltip
+        var Tooltip = d3
+          .select("body")
+          .append("div")
+          .style("opacity", 0)
+          .attr("class", "tooltip")
+          .style("background-color", "white")
+          .style("border", "solid")
+          .style("border-width", "2px")
+          .style("border-radius", "5px")
+          .style("padding", "5px")
+          .style("position", "absolute");
+        // A function that create / update the plot for a given variable:
+        function update(data) {
+          // Annotations
+          let ann_label;
+          let ann_title;
+          let ann_x;
+          let ann_y;
+          let ann_dx;
+          let ann_dy;
+          let ann_wrap = 300;
+          let ann_end = "dot";
+          if (
+            part_grp == "All current and future participants" &&
+            acct_desc == "Revenue"
+          ) {
+            ann_label =
+              "$ amount increase in revenue over the course of 5 years";
+            ann_title = "Around $12 trillion";
+            ann_x = 100;
+            ann_y = 60;
+            ann_end = "none"; // No end connector
+          } else if (
+            part_grp == "All current and future participants" &&
+            acct_desc == "Expenditures"
+          ) {
+            ann_label =
+              "Amount of jump in projected expenditures in 2097, likely due to increased utilization of services";
+            ann_title = "$6 trillion";
+            ann_x = 550;
+            ann_y = 85;
+            ann_dx = -70;
+            ann_dy = -30;
+            ann_wrap = 400;
+          } else if (
+            part_grp == "Future participants" &&
+            acct_desc == "Revenue"
+          ) {
+            ann_label =
+              "Amount of spike in revenue in 2097, perhaps due to increased contributons";
+            ann_title = "$500 billion";
+            ann_x = 550;
+            ann_y = 70;
+            ann_dx = -90;
+            ann_dy = 20;
+          } else if (
+            part_grp == "Future participants" &&
+            acct_desc == "Expenditures"
+          ) {
+            ann_label =
+              "Amount of jump in projected 2097 expenditures, likely as future participants begin to utilize services";
+            ann_title = "$1 trillion";
+            ann_x = 550;
+            ann_y = 70;
+            ann_dx = -90;
+            ann_dy = 20;
+            ann_wrap = 400;
+          } else if (
+            part_grp ==
+              "Participants who have attained eligibility age (age 65 and over)" &&
+            acct_desc == "Revenue"
+          ) {
+            ann_label =
+              "Revenues for those who have attained eligibility increase between 2095 and 2099";
+            ann_title = "Overall positive trend";
+            ann_x = 100;
+            ann_y = 60;
+            ann_end = "none"; // No end connector
+          } else if (
+            part_grp ==
+              "Participants who have attained eligibility age (age 65 and over)" &&
+            acct_desc == "Expenditures"
+          ) {
+            ann_label =
+              "Amount of increased expenditures over 5 years, indicating higher utilization of medically necessary & preventative services among those who have attained eligibliity between 2095 and 2099";
+            ann_title = "Over $2 trillion";
+            ann_x = 100;
+            ann_y = 60;
+            ann_end = "none";
+          } else if (
+            part_grp == "Participants who have not attained eligibility age" &&
+            acct_desc == "Revenue"
+          ) {
+            ann_label =
+              "A drop in revenues, likely due to decreased contributions from those who have not yet attained eligibility age";
+            ann_title = "Nearly $1 trillion";
+            ann_x = 775;
+            ann_y = 185;
+            ann_dx = 30;
+            ann_dy = -60;
+          } else if (
+            part_grp == "Participants who have not attained eligibility age" &&
+            acct_desc == "Expenditures"
+          ) {
+            ann_label = "Note the jump in projected expenditures in 2097";
+            ann_title = "Over $4 trillion";
+            ann_x = 550;
+            ann_y = 90;
+            ann_dx = -70;
+            ann_dy = -30;
+            ann_wrap = 400;
+          }
+
+          // Create annotations
+          d3.selectAll(".annotation-group").remove();
+          const annotations = [
+            {
+              note: {
+                label: ann_label,
+                wrap: ann_wrap,
+                title: ann_title,
+              },
+              connector: {
+                end: ann_end, // Can be none, or arrow or dot
+                type: "line", // ?? don't know what it does
+                lineType: "vertical", // ?? don't know what it does
+                endScale: 10, // dot size
+              },
+              //can use x, y directly instead of data
+              x: ann_x,
+              y: ann_y,
+              dy: ann_dy,
+              dx: ann_dx,
+            },
+          ];
+
+          const makeAnnotations = d3
+            .annotation()
+            .notePadding(15)
+            .annotations(annotations);
+
+          temp_data = part_grp_data(data, part_grp);
+          fin_data = dataReady(temp_data, acct_desc);
+
+          // Update the X axis
+          x.domain(fin_data.values.map((d) => d.date));
+          xAxis.call(d3.axisBottom(x).tickFormat(d3.format(".4")));
+
+          // Update the Y axis
+          if (acct_desc == "Expenditures") {
+            y.domain([
+              d3.max(fin_data.values, (d) => d.value) + 0.1,
+              d3.min(fin_data.values, (d) => d.value) - 0.1,
+            ]);
+          } else {
+            y.domain([
+              d3.min(fin_data.values, (d) => d.value) - 0.1,
+              d3.max(fin_data.values, (d) => d.value) + 0.1,
+            ]);
+          }
+
+          yAxis.transition().duration(1000).call(d3.axisLeft(y), y("Revenue"));
+
+          // Three function that change the tooltip when user hover / move / leave a cell
+          var bar_mouseover = function (evt, d) {
+            Tooltip.style("opacity", 1);
+            d3.select(this)
+              .style("stroke", "black")
+              .style("opacity", 1)
+              .style("cursor", "pointer");
+          };
+          var bar_mousemove = function (evt, d) {
+            Tooltip.html(
+              acct_desc == "Expenditures"
+                ? `Projected expenditures in ${Number(d.date) + 75}:<br> $${
+                    d.value
+                  } trillion`
+                : `Projected revenues in ${Number(d.date) + 75}:<br> $${
+                    d.value
+                  } trillion`
+            )
+              .style("left", evt.pageX + 20 + "px")
+              .style("top", evt.pageY - 20 + "px");
+          };
+          var bar_mouseleave = function (evt, d) {
+            Tooltip.style("opacity", 0);
+            d3.select(this).style("stroke", "white").style("opacity", 0.8);
+          };
+
+          // Create the u variable
+          var u = svg.selectAll("rect").data(fin_data.values);
+
+          u.enter()
+            .append("rect") // Add a new rect for each new elements
+            .merge(u) // get the already existing elements as well
+            .transition() // and apply changes to all of them
+            .duration(1000)
+            .attr("x", function (d) {
+              return x(d.date);
+            })
+            .attr("y", function (d) {
+              return y(d.value);
+            })
+            .attr("width", x.bandwidth())
+            .attr("height", function (d) {
+              return height - y(d.value);
+            })
+            .attr("fill", function (d) {
+              return acct_desc == "Expenditures" ? "#ff7d19" : "#4caf50";
+            });
+
+          u.on("mouseover", bar_mouseover)
+            .on("mousemove", bar_mousemove)
+            .on("mouseleave", bar_mouseleave);
+
+          // If less group in the new dataset, I delete the ones not in use anymore
+          u.exit().remove();
+
+          svg
+            .append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations);
+        }
+
+        // Y-Axis Label
+        svg
+          .append("text")
+          .attr("class", "y label")
+          .attr("text-anchor", "middle")
+          .attr("x", -(height / 2))
+          .attr("y", -30)
+          .attr("transform", "rotate(-90)")
+          .text("Projected Amount (in Trillions)");
+
+        window.update = update;
+
+        d3.select("#selectButton").on("change", function (d) {
+          // recover the option that has been chosen
+          part_grp = d3.select(this).property("value");
+          update(data);
+          // run the updateChart function with this selected option
+        });
+
+        d3.select("#acctButton").on("change", function (d) {
+          // recover the option that has been chosen
+          acct_desc = d3.select(this).property("value");
+          update(data);
+          // run the updateChart function with this selected option
+        });
+
+        // Initialize the plot with the first dataset
+        update(data);
       }
     </script>
   </body>
