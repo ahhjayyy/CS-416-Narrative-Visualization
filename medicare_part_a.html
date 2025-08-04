@@ -210,14 +210,17 @@
       <div id="info-box">
         <h2>About These Projections</h2>
         <p>
-          Medicare Part A can cover inpatient care within hospitals, critical
-          access hospitals, and skilled nursing facilities. It may also help pay
-          for hospice care and home health care."
+          <b
+            >Medicare Part A can cover inpatient care within hospitals, critical
+            access hospitals, and skilled nursing facilities. It may also help
+            pay for hospice care and home health care.</b
+          >
           <br />
           <br />
           Revenue for Medicare comes directly from federal spending, funded by
           contributions and dedicated income taxes on the American people.
           Expenditures entail paying out benefits to covered persons.
+          <br />
           <br />
           The "One Big Beautiful Bill Act" passed by US Congress in July 2025,
           will result in a nearly $500 billion reduction of funding for Medicare
@@ -226,12 +229,15 @@
           elgibility. It remains to be seen, with the coverage cuts that could
           lower expenditures coupled with revenue cuts, how the overall program
           projection will trend. Regardless, many people who rely on the program
-          will be left on their own.
+          will be left uninsured and without viable options in the private
+          healthcare marketplace.
           <br />
           <br />
-          Hover over the bars to see 75-year projection amounts. Use the
-          dropdown selectors to adjust the results by elgibility group and
-          revenue vs. expenditures.
+          <i
+            >Hover over the bars to see 75-year projection amounts. Use the
+            dropdown selectors to adjust the results by elgibility group and
+            revenue vs. expenditures.</i
+          >
         </p>
         <button class="button button2" onclick="history.back()">Go Back</button>
       </div>
@@ -249,11 +255,6 @@
       Social Insurance
     </footer>
     <script>
-      // Revenue for Medicare Part A is We see, that among all
-      // participant groups, revenue is increasing and expenditures also
-      // increased, however, there was a slight decrease in expenditures in
-      // 2024. The combination of increased revenue and slightly decreased
-      // expenditures explain the upward projection for Part A.
       async function init() {
         data = await d3.csv("USFR_StmtSocIns_20191001_20240930.csv", (d) => {
           return {
